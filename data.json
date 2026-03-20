@@ -1,5 +1,15 @@
 [
-  {"roll": 101, "name": "Arif Hossain", "gpa": "5.00", "grade": "A+"},
-  {"roll": 102, "name": "Sultana Razia", "gpa": "4.80", "grade": "A"},
-  {"roll": 103, "name": "Rakib Khan", "gpa": "4.00", "grade": "A-"}
+  {
+    "roll": "101",
+    "name": "Arif Hossain",
+    "father": "Abul Kashem",
+    "school": "Model High School",
+    "gpa": "5.00",
+    "subjects": {
+        "Bangla": 85,
+        "English": 80,
+        "Math": 95,
+        "Science": 88
+    }
+  }
 ]
