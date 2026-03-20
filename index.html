@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result System</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f4f9; text-align: center; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        input { width: 80%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        #resultArea { margin-top: 20px; font-weight: bold; color: #333; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>পরীক্ষার ফলাফল</h2>
+        <input type="number" id="rollInput" placeholder="রোল নম্বর লিখুন">
+        <button onclick="searchResult()">ফলাফল দেখুন</button>
+        <div id="resultArea"></div>
+    </div>
+
+    <script>
+        async function searchResult() {
+            const roll = document.getElementById("rollInput").value;
+            const resArea = document.getElementById("resultArea");
+            
+            if(!roll) { alert("অনুগ্রহ করে রোল দিন"); return; }
+
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+                const student = data.find(s => s.roll == roll);
+
+                if (student) {
+                    resArea.innerHTML = `<div style="color:green;">নাম: ${student.name} <br> GPA: ${student.gpa} <br> গ্রেড: ${student.grade}</div>`;
+                } else {
+                    resArea.innerHTML = `<div style="color:red;">দুঃখিত! রোল পাওয়া যায়নি।</div>`;
+                }
+            } catch (error) {
+                resArea.innerHTML = "ডাটা লোড করতে সমস্যা হচ্ছে।";
+            }
+        }
+    </script>
+</body>
+</html>
