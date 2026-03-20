@@ -3,94 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Marksheet</title>
+    <title>Advanced Result Portal</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f3; margin: 0; padding: 20px; }
-        .search-box { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; text-align: center; }
-        input { width: 80%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; transition: 0.3s; }
-        input:focus { border-color: #007bff; }
-        button { background: #007bff; color: white; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 15px; width: 85%; transition: 0.3s; }
-        button:hover { background: #0056b3; }
-
-        /* Marksheet Design */
-        #marksheet { display: none; background: white; max-width: 500px; margin: 30px auto; padding: 30px; border-radius: 10px; border-top: 10px solid #007bff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
-        .info { margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #f8f9fa; }
-        .gpa-box { margin-top: 20px; text-align: right; font-size: 18px; font-weight: bold; color: #28a745; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f3; padding: 15px; }
+        .box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
+        h2 { color: #2c3e50; margin-bottom: 20px; font-size: 20px; }
+        select, input { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { background: #1a73e8; color: white; padding: 12px; width: 100%; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         
-        @media print { .search-box { display: none; } #marksheet { border: none; box-shadow: none; } button.print-btn { display: none; } }
+        #resultView { display: none; margin-top: 25px; background: #fff; padding: 20px; border-radius: 8px; border-left: 5px solid #1a73e8; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .btn-inst { display:block; text-align:center; background:#ff9800; color:white; padding:10px; text-decoration:none; border-radius:5px; margin-top:10px; }
     </style>
 </head>
 <body>
 
-    <div class="search-box">
-        <h2>Result Portal</h2>
-        <input type="number" id="rollInput" placeholder="Enter Roll Number">
-        <button onclick="searchResult()">Get Marksheet</button>
-    </div>
+<div class="box">
+    <h2>Result Search Engine</h2>
+    
+    <!-- ড্রপডাউন ১: স্কুল/মাদ্রাসা -->
+    <select id="type">
+        <option value="">প্রতিষ্ঠান ধরন নির্বাচন করুন</option>
+        <option value="School">স্কুল (School)</option>
+        <option value="Madrasah">মাদ্রাসা (Madrasah)</option>
+    </select>
 
-    <div id="marksheet">
-        <div class="header">
-            <h2 id="schoolName">ACADEMIC MARKSHEET</h2>
-            <p>Annual Examination - 2026</p>
-        </div>
-        
-        <div class="info">
-            <strong>Name:</strong> <span id="sName"></span><br>
-            <strong>Father's Name:</strong> <span id="fName"></span><br>
-            <strong>Roll:</strong> <span id="sRoll"></span>
-        </div>
+    <!-- ড্রপডাউন ২: পরীক্ষার নাম -->
+    <select id="exam">
+        <option value="">পরীক্ষার নাম নির্বাচন করুন</option>
+        <option value="Annual Exam">Annual Exam</option>
+        <option value="Half Yearly">Half Yearly</option>
+        <option value="Dakhil Exam">Dakhil Exam</option>
+    </select>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Subject</th>
-                    <th>Marks</th>
-                </tr>
-            </thead>
-            <tbody id="subjectBody"></tbody>
-        </table>
+    <!-- ড্রপডাউন ৩: বছর -->
+    <select id="year">
+        <option value="">বছর নির্বাচন করুন</option>
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+    </select>
 
-        <div class="gpa-box">Result: GPA <span id="sGPA"></span></div>
-        <button class="print-btn" onclick="window.print()" style="background:#6c757d; margin-top:20px;">Print Marksheet</button>
-    </div>
+    <!-- ড্রপডাউন ৪: রেজাল্টের ধরন -->
+    <select id="resType" onchange="toggleRollInput()">
+        <option value="Individual">ব্যক্তিগত (Individual)</option>
+        <option value="Institutional">প্রতিষ্ঠান ভিত্তিক (Full Sheet)</option>
+    </select>
 
-    <script>
-        async function searchResult() {
-            const roll = document.getElementById("rollInput").value;
-            const marksheet = document.getElementById("marksheet");
+    <!-- রোল ইনপুট (শুধু ব্যক্তিগত রেজাল্টের জন্য দেখাবে) -->
+    <input type="number" id="roll" placeholder="রোল নম্বর দিন">
+
+    <button onclick="getResult()">Search Result</button>
+
+    <div id="resultView"></div>
+</div>
+
+<script>
+    function toggleRollInput() {
+        const resType = document.getElementById("resType").value;
+        const rollInput = document.getElementById("roll");
+        rollInput.style.display = (resType === "Individual") ? "block" : "none";
+    }
+
+    async function getResult() {
+        const type = document.getElementById("type").value;
+        const exam = document.getElementById("exam").value;
+        const year = document.getElementById("year").value;
+        const resType = document.getElementById("resType").value;
+        const roll = document.getElementById("roll").value;
+        const view = document.getElementById("resultView");
+
+        if(!type || !exam || !year) { alert("সবগুলো ঘর পূরণ করুন!"); return; }
+
+        try {
+            const response = await fetch('data.json');
+            const data = await response.json();
             
-            if(!roll) { alert("Please enter a roll number!"); return; }
+            // ডাটাবেস থেকে সঠিক লোকেশনে পৌঁছানো
+            const targetPath = data[type]?.[exam]?.[year];
+            if (!targetPath) { alert("দুঃখিত! এই ক্যাটাগরিতে কোনো ডাটা নেই।"); return; }
 
-            try {
-                const response = await fetch('data.json');
-                const data = await response.json();
-                const student = data.find(s => s.roll == roll);
-
+            if (resType === "Individual") {
+                const student = targetPath.Individual.find(s => s.roll == roll);
                 if (student) {
-                    document.getElementById("sName").innerText = student.name;
-                    document.getElementById("fName").innerText = student.father;
-                    document.getElementById("sRoll").innerText = student.roll;
-                    document.getElementById("sGPA").innerText = student.gpa;
-
-                    let tableRows = "";
-                    for (let subject in student.subjects) {
-                        tableRows += `<tr><td>${subject}</td><td>${student.subjects[subject]}</td></tr>`;
-                    }
-                    document.getElementById("subjectBody").innerHTML = tableRows;
-                    
-                    marksheet.style.display = "block";
-                } else {
-                    alert("Roll not found!");
-                    marksheet.style.display = "none";
-                }
-            } catch (error) {
-                alert("Error loading data!");
+                    let table = `<strong>Name:</strong> ${student.name}<br><strong>GPA:</strong> ${student.gpa}<table><tr><th>Subject</th><th>Mark</th></tr>`;
+                    for(let s in student.subjects) table += `<tr><td>${s}</td><td>${student.subjects[s]}</td></tr>`;
+                    view.innerHTML = table + "</table>";
+                } else { alert("রোল পাওয়া যায়নি!"); return; }
+            } else {
+                // প্রতিষ্ঠানের জন্য ডিরেক্ট লিঙ্ক বা ফাইল দেখানো
+                view.innerHTML = `<h4>সম্পূর্ণ রেজাল্ট শিট:</h4><a href="${targetPath.Institutional}" target="_blank" class="btn-inst">PDF ডাউনলোড করুন</a>`;
             }
-        }
-    </script>
+            view.style.display = "block";
+        } catch (e) { alert("Error connecting to Database!"); }
+    }
+</script>
+
 </body>
 </html>
