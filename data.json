@@ -1,28 +1,22 @@
-[
-  {
-    "roll": "101",
-    "name": "Md. Karim",
-    "father": "Abul Hashem",
-    "gpa": "5.00",
-    "subjects": {
-      "Bangla": 85,
-      "English": 82,
-      "Mathematics": 95,
-      "Social Science": 88,
-      "Religion": 90
+{
+  "School": {
+    "Annual Exam": {
+      "2026": {
+        "Individual": [
+          { "roll": "101", "name": "Md. Karim", "father": "Hashem", "gpa": "5.00", "subjects": {"Bangla": 85, "Math": 90} }
+        ],
+        "Institutional": "http://link-to-pdf-result.com/school-2026.pdf"
+      }
     }
   },
-  {
-    "roll": "102",
-    "name": "Sultana Akter",
-    "father": "Abdur Rahman",
-    "gpa": "4.80",
-    "subjects": {
-      "Bangla": 78,
-      "English": 85,
-      "Mathematics": 88,
-      "Social Science": 82,
-      "Religion": 92
+  "Madrasah": {
+    "Dakhil Exam": {
+      "2026": {
+        "Individual": [
+          { "roll": "501", "name": "Abdullah", "father": "Rahman", "gpa": "4.80", "subjects": {"Quran": 90, "Arabic": 85} }
+        ],
+        "Institutional": "http://link-to-pdf-result.com/madrasah-2026.pdf"
+      }
     }
   }
-]
+}
