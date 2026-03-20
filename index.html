@@ -3,29 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Result System</title>
+    <title>Student Marksheet</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f4f9; text-align: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        input { width: 80%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        button { background: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-        #resultArea { margin-top: 20px; font-weight: bold; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #eef2f3; margin: 0; padding: 20px; }
+        .search-box { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 450px; margin: 20px auto; text-align: center; }
+        input { width: 80%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #007bff; }
+        button { background: #007bff; color: white; padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 15px; width: 85%; transition: 0.3s; }
+        button:hover { background: #0056b3; }
+
+        /* Marksheet Design */
+        #marksheet { display: none; background: white; max-width: 500px; margin: 30px auto; padding: 30px; border-radius: 10px; border-top: 10px solid #007bff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .header { text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .info { margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f8f9fa; }
+        .gpa-box { margin-top: 20px; text-align: right; font-size: 18px; font-weight: bold; color: #28a745; }
+        
+        @media print { .search-box { display: none; } #marksheet { border: none; box-shadow: none; } button.print-btn { display: none; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>পরীক্ষার ফলাফল</h2>
-        <input type="number" id="rollInput" placeholder="রোল নম্বর লিখুন">
-        <button onclick="searchResult()">ফলাফল দেখুন</button>
-        <div id="resultArea"></div>
+
+    <div class="search-box">
+        <h2>Result Portal</h2>
+        <input type="number" id="rollInput" placeholder="Enter Roll Number">
+        <button onclick="searchResult()">Get Marksheet</button>
+    </div>
+
+    <div id="marksheet">
+        <div class="header">
+            <h2 id="schoolName">ACADEMIC MARKSHEET</h2>
+            <p>Annual Examination - 2026</p>
+        </div>
+        
+        <div class="info">
+            <strong>Name:</strong> <span id="sName"></span><br>
+            <strong>Father's Name:</strong> <span id="fName"></span><br>
+            <strong>Roll:</strong> <span id="sRoll"></span>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Marks</th>
+                </tr>
+            </thead>
+            <tbody id="subjectBody"></tbody>
+        </table>
+
+        <div class="gpa-box">Result: GPA <span id="sGPA"></span></div>
+        <button class="print-btn" onclick="window.print()" style="background:#6c757d; margin-top:20px;">Print Marksheet</button>
     </div>
 
     <script>
         async function searchResult() {
             const roll = document.getElementById("rollInput").value;
-            const resArea = document.getElementById("resultArea");
+            const marksheet = document.getElementById("marksheet");
             
-            if(!roll) { alert("অনুগ্রহ করে রোল দিন"); return; }
+            if(!roll) { alert("Please enter a roll number!"); return; }
 
             try {
                 const response = await fetch('data.json');
@@ -33,12 +71,24 @@
                 const student = data.find(s => s.roll == roll);
 
                 if (student) {
-                    resArea.innerHTML = `<div style="color:green;">নাম: ${student.name} <br> GPA: ${student.gpa} <br> গ্রেড: ${student.grade}</div>`;
+                    document.getElementById("sName").innerText = student.name;
+                    document.getElementById("fName").innerText = student.father;
+                    document.getElementById("sRoll").innerText = student.roll;
+                    document.getElementById("sGPA").innerText = student.gpa;
+
+                    let tableRows = "";
+                    for (let subject in student.subjects) {
+                        tableRows += `<tr><td>${subject}</td><td>${student.subjects[subject]}</td></tr>`;
+                    }
+                    document.getElementById("subjectBody").innerHTML = tableRows;
+                    
+                    marksheet.style.display = "block";
                 } else {
-                    resArea.innerHTML = `<div style="color:red;">দুঃখিত! রোল পাওয়া যায়নি।</div>`;
+                    alert("Roll not found!");
+                    marksheet.style.display = "none";
                 }
             } catch (error) {
-                resArea.innerHTML = "ডাটা লোড করতে সমস্যা হচ্ছে।";
+                alert("Error loading data!");
             }
         }
     </script>
